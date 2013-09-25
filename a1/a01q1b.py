@@ -2,35 +2,33 @@
 import check
 import driver
 
-## connections:
+## connections: Int[>=0] -> (listof Int[>=0])[length=N]
 ##
-## Purpose:
-##
-## Effects:
+## Purpose: Determines which switch controls which door, under the assumption
+## that each switch opens the door when in state 0
+## N.B. this should return the second list provided as an argument to
+## driver.initialize(N,[0]*N,switchList)
 ##
 ## Example: after driver.initialize(4, [0,0,0,0], [3,1,2,0]),
 ##          connections(4) => [3,1,2,0]
 
 def connections(N):
-	# This loop will create an array such that if the jth element is i,
-	# the ith door is controlled by switch j
 	result = [0]*N
-	for i in range(N) :
-		bottom = i
-		top = N-1
-		while (bottom != top) :
-			mid = (bottom + top) / 2
-			connections = [0] * N
-			connections[bottom:mid] = [0]*(mid-bottom)
-			if (driver.tryCombination(connections) == 0) :
-				bottom = mid + 1
-			else :
-				top = mid
-		result[bottom] = i
-	return result
+	combination = [0]*N
+	for switch in range(N) :
+		combination[switch] = 1
+		result[switch] = driver.tryCombination(combination)
+		combination[switch]= 0
+	return result	
 
 ## Tests:
 driver.initialize(4, [0,0,0,0], [3,1,2,0])
 check.expect('Q1B sample input/output', connections(4), [3,1,2,0])
 
+bigListLength = 10000
+testList = range(bigListLength)
+import random
+random.shuffle(testList)
+driver.initialize(bigListLength,bigListLength*[0],testList)
+check.expect('Q1B big shuffled list',connections(bigListLength),testList)
 # Be sure to do lots more of your own testing!
